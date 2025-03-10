@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity OSINT Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h2 { text-align: center; }
+        .btn-container { display: flex; justify-content: space-between; margin: 20px 0; }
+        .btn { padding: 10px 20px; background: #007bff; color: #fff; text-decoration: none; border-radius: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h2>Cybercrime OSINT Dashboard</h2>
+
+    <div class="btn-container">
+        <a href="/export" class="btn">Export to CSV</a>
+        <button id="refreshBtn" class="btn">Refresh Data</button>
+    </div>
+
+    <table id="osintTable">
+        <thead>
+            <tr>
+                <th>Headline</th>
+                <th>URL</th>
+                <th>Source</th>
+                <th>Published Date</th> <!-- ✅ Properly formatted date column -->
+            </tr>
+        </thead>
+        <tbody id="articleBody">
+            {% for article in articles %}
+            <tr>
+                <td>{{ article.headline }}</td>
+                <td><a href="{{ article.url }}" target="_blank">Read More</a></td>
+                <td>{{ article.source }}</td>
+                <td>{{ article.published_date }}</td> <!-- ✅ Correctly displayed published date -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function () {
+            $('#osintTable').DataTable();
+
+            $("#refreshBtn").click(function () {
+                $.get("/refresh", function (data) {
+                    let tbody = $("#articleBody");
+                    tbody.empty();
+                    data.articles.forEach(article => {
+                        tbody.append(`<tr>
+                            <td>${article.headline}</td>
+                            <td><a href="${article.url}" target="_blank">Read More</a></td>
+                            <td>${article.source}</td>
+                            <td>${article.published_date}</td>
+                        </tr>`);
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
